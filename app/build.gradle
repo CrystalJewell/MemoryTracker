@@ -25,6 +25,15 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile 'com.android.support:appcompat-v7:25.3.1'
-    testCompile 'junit:junit:4.12'
+    compile 'com.android.support:design:25.3.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    //Needed to access Maps
+    compile 'com.google.android.gms:play-services-maps:10.2.6'
+    //Needed to get location updates
+    compile 'com.google.android.gms:play-services-location:10.2.6'
+    //Butterknife
+    compile 'com.jakewharton:butterknife:8.6.0'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.6.0'
+    //For testing
+    testCompile 'junit:junit:4.12'
 }
