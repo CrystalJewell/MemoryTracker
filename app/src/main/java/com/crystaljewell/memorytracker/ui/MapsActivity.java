@@ -3,6 +3,7 @@ package com.crystaljewell.memorytracker.ui;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
@@ -29,6 +30,7 @@ import com.google.android.gms.maps.model.Marker;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
@@ -53,16 +55,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //Check to see if permission to access location has been granted
         verifyLocationPermissions();
-
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map_fragment);
-        mapFragment.getMapAsync(this);
     }
 
     private void verifyLocationPermissions() {
-        //Explicit permission has to be granted at time of using features Google deems potentially
-        //harmful to users in SDK 23+
+        /*
+        Explicit permission has to be granted at time of using features Google deems potentially
+        harmful to users in SDK 23+
+        */
         if (Build.VERSION.SDK_INT >= 23) {
             //Check to see if permission has already been granted for the users location
             if (ContextCompat.checkSelfPermission(this,
@@ -71,11 +70,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 buildGoogleApiClient();
             } else {
                 //User had not already granted permission, need to ask for it
-                requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_CODE);
+                requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        PERMISSION_REQUEST_CODE);
             }
         }
-        //If the user is not on SDK 23+ just go ahead and get current location since we requested
-        //permission in the manifest
+        /*
+        If the user is not on SDK 23+ just go ahead and get current location since we requested
+        permission in the manifest
+        */
         else {
             buildGoogleApiClient();
         }
@@ -95,9 +97,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     //Access has been granted, go ahead and build the GoogleApiClient
                     buildGoogleApiClient();
                 } else {
-                    //Permission denied, use AlertDialog to explain to user why we need this permission
-                    //Update PERMISSION_REQUEST_CODE to 2 when the user answers again it will go to
-                    //the next case in this switch statement
+                    /*
+                    Permission denied, use AlertDialog to explain to user why we need this permission
+                    Update PERMISSION_REQUEST_CODE to 2 when the user answers again it will go to
+                    the next case in this switch statement
+                    */
                     PERMISSION_REQUEST_CODE = 2;
                     explainPermissionNeededDialog();
                 }
@@ -109,14 +113,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     buildGoogleApiClient();
                 } else {
-                    //Permission denied, again.  Will have to give another alert dialog to user
-                    //letting them know this permission is required for the app to run.
+                    /*
+                    Permission denied, again.  Will have to give another alert dialog to user
+                    letting them know this permission is required for the app to run.
+                    */
                     permissionDeniedDialog();
                 }
                 break;
 
             default:
                 //This is the case it will come to if the resultCode is not a case above
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
                 break;
         }
     }
@@ -129,8 +136,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     */
     @TargetApi(Build.VERSION_CODES.M)
     private void explainPermissionNeededDialog() {
-        //Explain to user this app requires access to users location to be able to save memories to
-        //the map
+        /*
+        Explain to user this app requires access to users location to be able to save memories to
+        the map
+        */
         AlertDialog.Builder explainPermission = new AlertDialog.Builder(this);
         explainPermission.setTitle("Location Permission Required");
         explainPermission.setMessage("This app requires access to your device location to be able " +
@@ -138,12 +147,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 "will not run properly");
         explainPermission.setPositiveButton("OK, I got it",
                 new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        PERMISSION_REQUEST_CODE);
-            }
-        });
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                                PERMISSION_REQUEST_CODE);
+                    }
+                });
         //Creates the alert dialog
         explainPermission.create();
         //Shows the alert dialog on the screen
@@ -189,6 +198,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);
         }
+        // Set a listener for marker click.
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+
+                /*
+                Return false so we do not consume the event, which means we can click on multiple
+                markers without restarting the activity
+                */
+                return false;
+            }
+        });
     }
 
     protected synchronized void buildGoogleApiClient() {
@@ -199,6 +220,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .addApi(LocationServices.API)
                 .build();
         mGoogleApiClient.connect();
+        setupMapFragment();
+    }
+
+    private void setupMapFragment() {
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map_fragment);
+        mapFragment.getMapAsync(this);
     }
 
     /*
@@ -206,7 +235,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      */
     @Override
     public void onLocationChanged(Location location) {
-
         //Get users current location
         mCurrentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
 
@@ -246,11 +274,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    @Override
-    public void onConnectionSuspended(int i) {}
+    @OnClick(R.id.add_content_button)
+    protected void createMemory() {
+        Intent addContent = new Intent(this, MemoryActivity.class);
+        startActivity(addContent);
+    }
 
     @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {}
+    public void onConnectionSuspended(int i) {
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+    }
 
     protected void stopLocationUpdates() {
         // Removes location requests when the activity is in a paused or stopped state to help
