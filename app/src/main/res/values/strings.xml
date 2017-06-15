@@ -3,4 +3,5 @@
     <string name="title_activity_maps">Map</string>
     <string name="view_memories">View Memories</string>
     <string name="go_to_map">Go To Map</string>
+    <string name="no_camera_message">This device does not have a camera. This feature will not work.</string>
 </resources>

@@ -1,4 +1,4 @@
-package com.crystaljewell.memorytracker.ui;
+package com.crystaljewell.memorytracker.ui.memory.view;
 
 import android.content.Intent;
 import android.database.Cursor;
@@ -11,7 +11,7 @@ import com.crystaljewell.memorytracker.R;
 
 import butterknife.ButterKnife;
 
-public class MemoryActivity extends AppCompatActivity {
+public class ViewMemoriesActivity extends AppCompatActivity {
 
 
     private int RESULT_LOAD_IMAGE = 1;
@@ -20,7 +20,7 @@ public class MemoryActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_memory);
+        setContentView(R.layout.activity_view_memories);
         ButterKnife.bind(this);
     }
 

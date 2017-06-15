@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="contentArray">
+        <item>Take a Picture</item>
+        <item>Take a Video</item>
+        <item>Choose Existing Picture or Video</item>
+    </string-array>
+</resources>

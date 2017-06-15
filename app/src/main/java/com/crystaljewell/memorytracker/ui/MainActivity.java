@@ -5,8 +5,8 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import com.crystaljewell.memorytracker.R;
-import com.crystaljewell.memorytracker.ui.MapsActivity;
-import com.crystaljewell.memorytracker.ui.MemoryActivity;
+import com.crystaljewell.memorytracker.ui.map.MapsActivity;
+import com.crystaljewell.memorytracker.ui.memory.view.ViewMemoriesActivity;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.view_memories_card)
     protected void goToMemories() {
-        Intent memoriesIntent = new Intent(this, MemoryActivity.class);
+        Intent memoriesIntent = new Intent(this, ViewMemoriesActivity.class);
         startActivity(memoriesIntent);
     }
 

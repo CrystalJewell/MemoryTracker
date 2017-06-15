@@ -1,4 +1,4 @@
-package com.crystaljewell.memorytracker.ui;
+package com.crystaljewell.memorytracker.ui.map;
 
 import android.Manifest;
 import android.annotation.TargetApi;
@@ -16,6 +16,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 
 import com.crystaljewell.memorytracker.R;
+import com.crystaljewell.memorytracker.ui.memory.create.CreateMemory;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -27,6 +28,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -41,6 +43,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
     private LatLng mCurrentLatLng;
+    private LatLng mMemoryLocation;
     private Marker mCurrLocationMarker;
     private LocationRequest mLocationRequest;
     private int PERMISSION_REQUEST_CODE = 1;
@@ -275,9 +278,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     @OnClick(R.id.add_content_button)
-    protected void createMemory() {
-        Intent addContent = new Intent(this, MemoryActivity.class);
-        startActivity(addContent);
+    protected void addContentDialog() {
+        final AlertDialog.Builder addMemory = new AlertDialog.Builder(this);
+        addMemory.setTitle("Add Memory?");
+        addMemory.setMessage("Would you like to add a memory at your current location?");
+        addMemory.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                mMemoryLocation = mCurrentLatLng;
+                Intent createMemory = new Intent(MapsActivity.this, CreateMemory.class);
+                createMemory.putExtra("MEMORY_LOCATION", mMemoryLocation);
+                startActivityForResult(createMemory, 1);
+
+            }
+        });
+
+        addMemory.create();
+        addMemory.show();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        //After we come back from adding a memory we need to mark that position on the map, add the
+        //title they gave the memory as well as set the onMarkerClick to han
+        String title = data.getStringExtra("MEMORY_TITLE");
+        mMap.addMarker(new MarkerOptions()
+                .position(mMemoryLocation).title(title));
+
     }
 
     @Override
